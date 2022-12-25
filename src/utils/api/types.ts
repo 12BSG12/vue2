@@ -2,7 +2,7 @@ export interface ResUsers {
   id: number;
   FIO: string;
   job: string | null;
-  task: ResTodo[] | null;
+  task: UserTaskType[] | null;
 }
 
 export interface ResJob {
@@ -10,7 +10,9 @@ export interface ResJob {
   name: string;
 }
 
-export interface ResTodo extends ResJob {
+export type ResTodo = ResJob
+
+export interface UserTaskType extends ResTodo{
   start: string;
   end: string;
 }

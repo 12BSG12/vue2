@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card title="Должности">
+    <a-card title="Задачи">
       <a-input-search
         slot="extra"
         placeholder="Поиск"
@@ -9,7 +9,7 @@
         v-model="query"
         @input="debouncedSearch"
       />
-      <a-list item-layout="horizontal" :data-source="jobs">
+      <a-list item-layout="horizontal" :data-source="todos">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-button
             slot="actions"
@@ -19,7 +19,7 @@
           >
             <a-icon type="edit" theme="twoTone" />
           </a-button>
-          <a-popover slot="actions" title="Удалить должность?" trigger="hover">
+          <a-popover slot="actions" title="Удалить задачу?" trigger="hover">
             <div class="alertDel" slot="content">
               <a-button @click="delUser">Да</a-button>
             </div>
@@ -29,7 +29,7 @@
           </a-popover>
           <a-list-item-meta>
             <div slot="title">
-              <jobEditForm v-if="item.id === editMode.id && editMode.isEdit" />
+              <TodoEditForm v-if="item.id === editMode.id && editMode.isEdit" />
               <div v-else>
                 <span>{{ item.name }}</span>
               </div>
@@ -37,12 +37,12 @@
           </a-list-item-meta>
         </a-list-item>
         <a-button slot="footer" type="primary" block @click="showAddForm = true"
-          >Добавить должность</a-button
+          >Добавить задачу</a-button
         >
       </a-list>
     </a-card>
-    <a-modal v-model="showAddForm" title="Добавить должность" @ok="showAddForm = false">
-      <JobForm/>
+    <a-modal v-model="showAddForm" title="Добавить задачу" @ok="showAddForm = false">
+      <TodoForm/>
     </a-modal>
   </div>
 </template>
@@ -51,14 +51,14 @@
 import Vue from 'vue';
 import {mapState, mapActions, mapMutations} from 'vuex'
 import debounce from 'lodash/debounce';
-import jobEditForm from './JobEditForm.vue'
-import JobForm from './JobAddForm.vue'
+import TodoEditForm from './TodoEditForm.vue'
+import TodoForm from './TodoAddForm.vue'
 
 export default Vue.extend({
-  name: 'JobList',
+  name: 'TodoList',
   components:{
-    jobEditForm,
-    JobForm
+    TodoEditForm,
+    TodoForm
   },
   data() {
     return {
@@ -68,9 +68,9 @@ export default Vue.extend({
   },
   computed: {
     ...mapState({
-      editMode: state => state.job.editMode,
-      search: state => state.job.search,
-      jobs: state => state.job.jobs
+      editMode: state => state.todo.editMode,
+      search: state => state.todo.search,
+      todos: state => state.todo.todos
     }),
     query: {
       get() {
@@ -83,23 +83,23 @@ export default Vue.extend({
   },
   methods: {
     ...mapMutations({
-      showEditForm: 'job/showEditForm',
+      showEditForm: 'todo/showEditForm',
     }),
     ...mapActions({
-      setSearchQuery: 'job/setSearchQuery',
-      getJobs: 'job/getJobs'
+      setSearchQuery: 'todo/setSearchQuery',
+      getTodos: 'todo/getTodos'
     }),
     showModal() {
       this.showTodo = true;
     },
     debouncedSearch: debounce(function() {
-      this.getJobs();
+      this.getTodos();
     }, 250),
     delUser() {
     },
   },
   mounted(){
-    this.getJobs()
+    this.getTodos()
   },
 });
 </script>

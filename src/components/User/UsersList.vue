@@ -17,7 +17,7 @@
           <a-button
             slot="actions"
             size="small"
-            @click="() => showEditForm(item.id)"
+            @click="() => showEditForm(item)"
             :disabled="editMode.isEdit"
           >
             <a-icon type="edit" theme="twoTone" />
@@ -52,7 +52,8 @@
       title="Информация о задачах"
       @ok="showTodo = false"
     >
-      <a-button> Добавить задачу </a-button>
+      <a-button v-if="!showAddTodoForm" @click="showAddTodoForm = true"> Добавить задачу </a-button>
+      <UserAddTodoForm v-else :closeAddTodoForm="closeAddTodoForm" />
       <UserTodoList :todos="todos" />
     </a-modal>
     <a-modal v-model="showAddForm" title="Добавить пользователя" @ok="showAddForm = false">
@@ -66,6 +67,7 @@ import Vue from 'vue';
 import UserForm from "./UserAddForm.vue";
 import UserTodoList from "./UserTodoList.vue";
 import UserEditForm from "./UserEditForm.vue";
+import UserAddTodoForm from "./UserAddTodoForm.vue";
 import {mapState, mapMutations, mapActions} from 'vuex'
 import debounce from 'lodash/debounce';
 
@@ -74,12 +76,14 @@ export default Vue.extend({
   components:{
     UserForm,
     UserTodoList,
-    UserEditForm
+    UserEditForm,
+    UserAddTodoForm
   },
   data() {
     return {
       showTodo: false,
       showAddForm: false,
+      showAddTodoForm: false,
       todos: [],
     };
   },
@@ -103,7 +107,6 @@ export default Vue.extend({
   methods: {
     ...mapMutations({
       showEditForm: 'user/showEditForm',
-      setSearch: 'user/setSearch'
     }),
     ...mapActions({
       setSearchQuery: 'user/setSearchQuery',
@@ -113,9 +116,12 @@ export default Vue.extend({
       this.todos = task;
       this.showTodo = true;
     },
-    debouncedSearch: debounce(function () {
+    debouncedSearch: debounce(function() {
       this.getUsers();
     }, 250),
+    closeAddTodoForm(){
+      this.showAddTodoForm = false;
+    },
     delUser() {
     },
   },
@@ -126,10 +132,6 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.alertDel {
-  display: flex;
-  justify-content: space-evenly;
-}
 .userInfo {
   display: flex;
   flex-direction: column;

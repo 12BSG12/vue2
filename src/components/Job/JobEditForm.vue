@@ -1,30 +1,15 @@
 <template>
   <a-form :form="form" class="form" @submit="handleSubmit">
-    <a-form-item label="ФИО">
+    <a-form-item label="Должность">
       <a-input
         v-decorator="[
-          'fio',
+          'job',
           {
-            initialValue: this.editMode.inputValue,
-            rules: [{ required: true, message: 'Введите ФИО!' }],
+            initialValue: this.editMode.value,
+            rules: [{ required: true, message: 'Введите должность!' }],
           },
         ]"
       />
-    </a-form-item>
-    <a-form-item label="Должность" has-feedback>
-      <a-select
-        v-decorator="[
-          'select',
-          {
-            initialValue: this.editMode.selectValue,
-            rules: [{ required: true, message: 'Please select your todo!' }],
-          },
-        ]"
-      >
-        <a-select-option value="1"> Option 1 </a-select-option>
-        <a-select-option value="2"> Option 2 </a-select-option>
-        <a-select-option value="3"> Option 3 </a-select-option>
-      </a-select>
     </a-form-item>
     <div class="formBtn">
       <a-button type="primary" html-type="submit">Сохранить</a-button>
@@ -38,7 +23,7 @@ import Vue from 'vue';
 import {mapState, mapMutations} from 'vuex'
 
 export default Vue.extend({
-  name: 'UserEditForm',
+  name: 'jobEditForm',
   data() {
     return {
       form: this.$form.createForm(this, { name: 'validate_other' }),
@@ -46,12 +31,12 @@ export default Vue.extend({
   },
   computed:{
     ...mapState({
-      editMode: state => state.user.editMode,
+      editMode: state => state.job.editMode,
     }),
   },
   methods:{
     ...mapMutations({
-      closeEditForm: 'user/closeEditForm'
+      closeEditForm: 'job/closeEditForm'
     }),
     handleSubmit(e) {
       e.preventDefault();
@@ -68,7 +53,6 @@ export default Vue.extend({
 <style scoped>
 .form .ant-form-item {
   margin: 0;
-  max-width: 200px;
 }
 .formBtn {
   margin-top: 10px;
