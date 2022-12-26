@@ -11,6 +11,7 @@
 
 <script lang="js">
 import Vue from 'vue';
+import { mapActions } from 'vuex';
 
 export default Vue.extend({
   name: 'JobForm',
@@ -20,11 +21,15 @@ export default Vue.extend({
     };
   },
   methods:{
+    ...mapActions({
+      createJob: 'job/createJob'
+    }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values);
+          this.createJob(values)
         }
       });
     },

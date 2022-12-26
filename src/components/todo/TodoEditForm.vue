@@ -3,7 +3,7 @@
     <a-form-item label="Задача">
       <a-input
         v-decorator="[
-          'job',
+          'todo',
           {
             initialValue: this.editMode.value,
             rules: [{ required: true, message: 'Введите задачу!' }],
@@ -20,7 +20,7 @@
 
 <script lang="js">
 import Vue from 'vue';
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'TodoEditForm',
@@ -38,11 +38,15 @@ export default Vue.extend({
     ...mapMutations({
       closeEditForm: 'todo/closeEditForm'
     }),
+    ...mapActions({
+      updateTodo: 'todo/updateTodo'
+    }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values);
+          this.updateTodo(values)
         }
       });
     },

@@ -21,7 +21,7 @@
         /></a-button>
         <a-popover slot="actions" title="Удалить задачу?" trigger="hover">
           <div class="alertDel" slot="content">
-            <a-button slot="content" size="small" @click="delTodo">Да</a-button>
+            <a-button slot="content" size="small" @click="delUserTodo(todo.id)">Да</a-button>
           </div>
           <a-button size="small" type="danger">
             <a-icon type="delete" />
@@ -40,7 +40,7 @@
 <script lang="js">
 import Vue from 'vue';
 import UserEditTodoForm from './UserEditTodoForm.vue'
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'UserTodoList',
@@ -59,9 +59,10 @@ export default Vue.extend({
     ...mapMutations({
       showEditTodoForm: 'user/showEditTodoForm',
     }),
+    ...mapActions({
+      delUserTodo: 'user/delUserTodo',
+    }),
     endTodo() {
-    },
-    delTodo() {
     },
   }
 });

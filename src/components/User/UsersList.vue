@@ -11,20 +11,18 @@
       />
       <a-list item-layout="horizontal" :data-source="users">
         <a-list-item slot="renderItem" slot-scope="item">
-          <a-button slot="actions" size="small" @click="() => showModal(item.task)">
-            Задачи
-          </a-button>
+          <a-button slot="actions" size="small" @click="showModal(item)"> Задачи </a-button>
           <a-button
             slot="actions"
             size="small"
-            @click="() => showEditForm(item)"
+            @click="showEditForm(item)"
             :disabled="editMode.isEdit"
           >
             <a-icon type="edit" theme="twoTone" />
           </a-button>
           <a-popover slot="actions" title="Удалить пользователя?" trigger="hover">
             <div class="alertDel" slot="content">
-              <a-button @click="delUser">Да</a-button>
+              <a-button @click="delUser(item.id)">Да</a-button>
             </div>
             <a-button size="small" type="danger">
               <a-icon type="delete" />
@@ -85,9 +83,17 @@ export default Vue.extend({
       showAddForm: false,
       showAddTodoForm: false,
       todos: [],
+      id: 0,
     };
   },
-
+  watch: {
+    users(arr){
+      const newTodo = arr.find(item => item.id === this.id)?.task
+      if(newTodo){
+        this.todos = newTodo
+      }
+    },
+  },
   computed: {
     ...mapState({
       editMode: state => state.user.editMode,
@@ -101,28 +107,30 @@ export default Vue.extend({
       set(val) {
         return this.setSearchQuery(val);
       }
-    }
+    },
   },
 
   methods: {
     ...mapMutations({
       showEditForm: 'user/showEditForm',
+      setTodoUserInfo: 'user/setTodoUserInfo',
     }),
     ...mapActions({
       setSearchQuery: 'user/setSearchQuery',
-      getUsers: 'user/getUsers'
+      getUsers: 'user/getUsers',
+      delUser: 'user/delUser',
     }),
-    showModal(task) {
-      this.todos = task;
+    showModal(item) {
+      this.id = item.id;
+      this.todos = item.task;
       this.showTodo = true;
+      this.setTodoUserInfo(item)
     },
     debouncedSearch: debounce(function() {
       this.getUsers();
     }, 250),
     closeAddTodoForm(){
       this.showAddTodoForm = false;
-    },
-    delUser() {
     },
   },
   mounted(){

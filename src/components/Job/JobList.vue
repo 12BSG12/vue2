@@ -21,7 +21,7 @@
           </a-button>
           <a-popover slot="actions" title="Удалить должность?" trigger="hover">
             <div class="alertDel" slot="content">
-              <a-button @click="delUser">Да</a-button>
+              <a-button @click="delJob({item, users})">Да</a-button>
             </div>
             <a-button size="small" type="danger">
               <a-icon type="delete" />
@@ -70,7 +70,9 @@ export default Vue.extend({
     ...mapState({
       editMode: state => state.job.editMode,
       search: state => state.job.search,
-      jobs: state => state.job.jobs
+      jobs: state => state.job.jobs,
+      users: state => state.user.users,
+      updateUsers: state => state.job.updateUsers,
     }),
     query: {
       get() {
@@ -81,13 +83,20 @@ export default Vue.extend({
       }
     }
   },
+  watch:{
+    updateUsers(arr){
+      this.setUsers(arr)
+    }
+  },
   methods: {
     ...mapMutations({
       showEditForm: 'job/showEditForm',
+      setUsers: 'user/setUsers',
     }),
     ...mapActions({
       setSearchQuery: 'job/setSearchQuery',
-      getJobs: 'job/getJobs'
+      getJobs: 'job/getJobs',
+      delJob: 'job/delJob',
     }),
     showModal() {
       this.showTodo = true;
@@ -95,8 +104,6 @@ export default Vue.extend({
     debouncedSearch: debounce(function() {
       this.getJobs();
     }, 250),
-    delUser() {
-    },
   },
   mounted(){
     this.getJobs()

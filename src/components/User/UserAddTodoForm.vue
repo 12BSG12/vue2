@@ -2,15 +2,7 @@
   <a-form v-bind="formItemLayout" :form="form" class="form" @submit="handleSubmit">
     <a-form-item has-feedback >
       <a-select  v-decorator="['select', selectConfig]" placeholder="Please select a todo">
-        <a-select-option value="1">
-          Option 1
-        </a-select-option>
-        <a-select-option value="2">
-          Option 2
-        </a-select-option>
-        <a-select-option value="3">
-          Option 3
-        </a-select-option>
+        <a-select-option v-for="todo in todos" :value="todo.name" :key="todo.id">{{todo.name}}</a-select-option>
       </a-select>
     </a-form-item>
     <a-form-item>
@@ -25,6 +17,7 @@
 
 <script lang="js">
 import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'UserAddTodoForm',
@@ -51,7 +44,15 @@ export default Vue.extend({
       form: this.$form.createForm(this, { name: 'validate_other' }),
     };
   },
+  computed:{
+    ...mapState({
+      todos: state => state.todo.todos,
+    }),
+  },
   methods:{
+    ...mapActions({
+      updateUserTodo: 'user/updateUserTodo'
+    }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, fieldsValue) => {
@@ -65,6 +66,7 @@ export default Vue.extend({
           'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')],
         };
         console.log('Received values of form: ', values);
+        this.updateUserTodo(values)
       });
     },
   }

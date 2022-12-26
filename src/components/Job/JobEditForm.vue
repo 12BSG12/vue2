@@ -20,7 +20,7 @@
 
 <script lang="js">
 import Vue from 'vue';
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'jobEditForm',
@@ -32,17 +32,22 @@ export default Vue.extend({
   computed:{
     ...mapState({
       editMode: state => state.job.editMode,
+      users: state => state.user.users,
     }),
   },
   methods:{
     ...mapMutations({
       closeEditForm: 'job/closeEditForm'
     }),
+    ...mapActions({
+      updateJob: 'job/updateJob'
+    }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values);
+          this.updateJob({arg: values, users: this.users})
         }
       });
     },

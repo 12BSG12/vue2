@@ -23,7 +23,7 @@
 <script lang="js">
 import { isMoment } from 'moment';
 import Vue from 'vue';
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'UserEditTodoForm',
@@ -50,6 +50,9 @@ export default Vue.extend({
     ...mapMutations({
       closeEditTodoForm: 'user/closeEditTodoForm'
     }),
+    ...mapActions({
+      updateUserTodoDate: 'user/updateUserTodoDate'
+    }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, fieldsValue) => {
@@ -57,12 +60,12 @@ export default Vue.extend({
           return;
         }
         const rangeValue = fieldsValue['range-picker'];
-        console.log(fieldsValue);
         const values = {
           ...fieldsValue,
           'range-picker': isMoment(rangeValue[0]) ? [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')]: rangeValue,
         };
         console.log('Received values of form: ', values);
+        this.updateUserTodoDate(values)
       });
     },
   }

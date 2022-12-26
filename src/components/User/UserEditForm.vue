@@ -21,9 +21,7 @@
           },
         ]"
       >
-        <a-select-option value="1"> Option 1 </a-select-option>
-        <a-select-option value="2"> Option 2 </a-select-option>
-        <a-select-option value="3"> Option 3 </a-select-option>
+        <a-select-option v-for="job in jobs" :value="job.name" :key="job.id">{{job.name}}</a-select-option>
       </a-select>
     </a-form-item>
     <div class="formBtn">
@@ -35,7 +33,7 @@
 
 <script lang="js">
 import Vue from 'vue';
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'UserEditForm',
@@ -47,17 +45,22 @@ export default Vue.extend({
   computed:{
     ...mapState({
       editMode: state => state.user.editMode,
+      jobs: state => state.job.jobs,
     }),
   },
   methods:{
     ...mapMutations({
-      closeEditForm: 'user/closeEditForm'
+      closeEditForm: 'user/closeEditForm',
+    }),
+    ...mapActions({
+      updateUser: 'user/updateUser'
     }),
     handleSubmit(e) {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values);
+          this.updateUser(values)
         }
       });
     },

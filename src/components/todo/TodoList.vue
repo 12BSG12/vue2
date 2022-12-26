@@ -21,7 +21,7 @@
           </a-button>
           <a-popover slot="actions" title="Удалить задачу?" trigger="hover">
             <div class="alertDel" slot="content">
-              <a-button @click="delUser">Да</a-button>
+              <a-button @click="delTodo({item, users})">Да</a-button>
             </div>
             <a-button size="small" type="danger">
               <a-icon type="delete" />
@@ -70,7 +70,8 @@ export default Vue.extend({
     ...mapState({
       editMode: state => state.todo.editMode,
       search: state => state.todo.search,
-      todos: state => state.todo.todos
+      todos: state => state.todo.todos,
+      users: state => state.user.users
     }),
     query: {
       get() {
@@ -87,7 +88,8 @@ export default Vue.extend({
     }),
     ...mapActions({
       setSearchQuery: 'todo/setSearchQuery',
-      getTodos: 'todo/getTodos'
+      getTodos: 'todo/getTodos',
+      delTodo: 'todo/delTodo'
     }),
     showModal() {
       this.showTodo = true;
@@ -95,8 +97,6 @@ export default Vue.extend({
     debouncedSearch: debounce(function() {
       this.getTodos();
     }, 250),
-    delUser() {
-    },
   },
   mounted(){
     this.getTodos()
