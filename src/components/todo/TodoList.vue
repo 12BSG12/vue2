@@ -71,6 +71,7 @@ export default Vue.extend({
       editMode: state => state.todo.editMode,
       search: state => state.todo.search,
       todos: state => state.todo.todos,
+      updateUsers: state => state.todo.updateUsers,
       users: state => state.user.users
     }),
     query: {
@@ -82,9 +83,15 @@ export default Vue.extend({
       }
     }
   },
+  watch:{
+    updateUsers(arr){
+      this.setUsers(arr)
+    }
+  },
   methods: {
     ...mapMutations({
       showEditForm: 'todo/showEditForm',
+      setUsers: 'user/setUsers',
     }),
     ...mapActions({
       setSearchQuery: 'todo/setSearchQuery',

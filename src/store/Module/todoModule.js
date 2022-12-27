@@ -33,8 +33,8 @@ export const todoModule = {
       state.todos = state.todos.filter((item) => item.id !== id);
     },
     updateUsers(state, users) {
-      state.updateUsers = users
-    }
+      state.updateUsers = users;
+    },
   },
   actions: {
     setSearchQuery({ commit }, searchQuery) {
@@ -55,36 +55,81 @@ export const todoModule = {
       await taskApi.delTask(item.id);
       commit('delateTodo', item.id);
       let usersTodoDelArr = [];
-      let updateUsers = [];
+      let newUsers = [];
       users.forEach((i) => {
         i.task.forEach((j) => {
           if (j.name === item.name) {
             usersTodoDelArr.push(i);
           }
         });
+        const body = {
+          ...i,
+          ...{ task: i.task.filter((obj) => obj.name !== item.name) },
+        };
+        newUsers.push(body);
       });
       if (usersTodoDelArr.length > 0) {
         usersTodoDelArr.forEach(async (el) => {
           const body = {
-            FIO: el.FIO,
-            job: el.job,
+            ...el,
             task: el.task.filter((obj) => obj.name !== item.name),
           };
           await usersApi.editUser(el.id, body);
         });
       }
-    
-      // commit('updateUsers', users.map((user) => (user.job === item.name ? { ...user, ...{ job: '' } } : user)));
+      commit('updateUsers', newUsers);
     },
-    async updateTodo({ state, commit }, arg) {
+    async updateTodo({ state, commit }, { values, users }) {
       const body = {
-        name: arg.todo,
+        name: values.todo,
       };
       await taskApi.editTask(state.editMode.id, body);
       const todos = state.todos.map((todo) =>
         todo.id === state.editMode.id ? { ...todo, ...body } : todo,
       );
       commit('setTodos', todos);
+      let usersTodoDelArr = [];
+      let newUsers = [];
+      users.forEach((i) => {
+        i.task.forEach((j) => {
+          if (j.name === state.editMode.value) {
+            usersTodoDelArr.push(i);
+          }  
+        });
+        const body = {
+          ...i,
+          task: i.task.map((task) =>
+              task.name === state.editMode.value
+                ? {
+                    ...task,
+                    ...{
+                      name: values.todo,
+                    },
+                  }
+                : task,
+            ),
+        };
+        newUsers.push(body);
+      });
+      if (usersTodoDelArr.length > 0) {
+        usersTodoDelArr.forEach(async (el) => {
+          const body = {
+            ...el,
+            task: el.task.map((task) =>
+                task.name === state.editMode.value
+                  ? {
+                      ...task,
+                      ...{
+                        name: values.todo,
+                      },
+                    }
+                  : task,
+              ),
+          };
+          await usersApi.editUser(el.id, body);
+        });
+      }
+      commit('updateUsers', newUsers);
     },
   },
   namespaced: true,

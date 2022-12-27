@@ -32,6 +32,7 @@ export default Vue.extend({
   computed:{
     ...mapState({
       editMode: state => state.todo.editMode,
+      users: state => state.user.users
     }),
   },
   methods:{
@@ -46,7 +47,7 @@ export default Vue.extend({
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values);
-          this.updateTodo(values)
+          this.updateTodo({values, users: this.users})
         }
       });
     },
