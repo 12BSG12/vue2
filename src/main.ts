@@ -15,6 +15,7 @@ import {
   Popover,
   Select,
   DatePicker,
+  Alert,
 } from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 
@@ -32,6 +33,7 @@ Vue.use(Form);
 Vue.use(Popover);
 Vue.use(Select);
 Vue.use(DatePicker);
+Vue.use(Alert);
 
 Vue.config.productionTip = false;
 

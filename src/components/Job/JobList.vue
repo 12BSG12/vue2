@@ -19,14 +19,16 @@
           >
             <a-icon type="edit" theme="twoTone" />
           </a-button>
-          <a-popover slot="actions" title="Удалить должность?" trigger="hover">
-            <div class="alertDel" slot="content">
-              <a-button @click="delJob({item, users})">Да</a-button>
-            </div>
-            <a-button size="small" type="danger">
-              <a-icon type="delete" />
-            </a-button>
-          </a-popover>
+          <div slot="actions" @mouseover="setJobInfo({item, users})">
+            <a-popover  :title="jobInfo.description" trigger="hover">
+              <div class="alertDel" slot="content">
+                <a-button @click="delJob({item, users})">Да</a-button>
+              </div>
+              <a-button size="small" type="danger">
+                <a-icon type="delete" />
+              </a-button>
+            </a-popover>
+          </div>
           <a-list-item-meta>
             <div slot="title">
               <jobEditForm v-if="item.id === editMode.id && editMode.isEdit" />
@@ -73,6 +75,7 @@ export default Vue.extend({
       jobs: state => state.job.jobs,
       users: state => state.user.users,
       updateUsers: state => state.job.updateUsers,
+      jobInfo: state => state.job.jobInfo,
     }),
     query: {
       get() {
@@ -92,6 +95,7 @@ export default Vue.extend({
     ...mapMutations({
       showEditForm: 'job/showEditForm',
       setUsers: 'user/setUsers',
+      setJobInfo: 'job/setJobInfo'
     }),
     ...mapActions({
       setSearchQuery: 'job/setSearchQuery',

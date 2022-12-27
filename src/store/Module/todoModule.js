@@ -10,6 +10,10 @@ export const todoModule = {
       value: '',
     },
     updateUsers: [],
+    todoError: {
+      isError: false,
+      description: '',
+    },
   }),
   getters: {},
   mutations: {
@@ -35,6 +39,9 @@ export const todoModule = {
     updateUsers(state, users) {
       state.updateUsers = users;
     },
+    setError(state, body) {
+      state.todoError = body;
+    },
   },
   actions: {
     setSearchQuery({ commit }, searchQuery) {
@@ -52,32 +59,44 @@ export const todoModule = {
       commit('setTodos', [...state.todos, await taskApi.createTask(body)]);
     },
     async delTodo({ commit }, { item, users }) {
-      await taskApi.delTask(item.id);
-      commit('delateTodo', item.id);
-      let usersTodoDelArr = [];
-      let newUsers = [];
-      users.forEach((i) => {
-        i.task.forEach((j) => {
-          if (j.name === item.name) {
-            usersTodoDelArr.push(i);
-          }
-        });
-        const body = {
-          ...i,
-          ...{ task: i.task.filter((obj) => obj.name !== item.name) },
-        };
-        newUsers.push(body);
+      const isError = users.some((user) => {
+        return user.task.some((j) => j.name === item.name);
       });
-      if (usersTodoDelArr.length > 0) {
-        usersTodoDelArr.forEach(async (el) => {
-          const body = {
-            ...el,
-            task: el.task.filter((obj) => obj.name !== item.name),
-          };
-          await usersApi.editUser(el.id, body);
+
+      if (isError) {
+        commit('setError', {
+          isError,
+          description:
+            'Данную задачу невозможно удалить, так как она кем-то выполняется. Для того чтобы удалить данную задачу сперва удалить её из списка задач пользователя.',
         });
+      } else {
+        await taskApi.delTask(item.id);
+        commit('delateTodo', item.id);
+        let usersTodoDelArr = [];
+        let newUsers = [];
+        users.forEach((i) => {
+          i.task.forEach((j) => {
+            if (j.name === item.name) {
+              usersTodoDelArr.push(i);
+            }
+          });
+          const body = {
+            ...i,
+            ...{ task: i.task.filter((obj) => obj.name !== item.name) },
+          };
+          newUsers.push(body);
+        });
+        if (usersTodoDelArr.length > 0) {
+          usersTodoDelArr.forEach(async (el) => {
+            const body = {
+              ...el,
+              task: el.task.filter((obj) => obj.name !== item.name),
+            };
+            await usersApi.editUser(el.id, body);
+          });
+        }
+        commit('updateUsers', newUsers);
       }
-      commit('updateUsers', newUsers);
     },
     async updateTodo({ state, commit }, { values, users }) {
       const body = {
@@ -94,11 +113,28 @@ export const todoModule = {
         i.task.forEach((j) => {
           if (j.name === state.editMode.value) {
             usersTodoDelArr.push(i);
-          }  
+          }
         });
         const body = {
           ...i,
           task: i.task.map((task) =>
+            task.name === state.editMode.value
+              ? {
+                  ...task,
+                  ...{
+                    name: values.todo,
+                  },
+                }
+              : task,
+          ),
+        };
+        newUsers.push(body);
+      });
+      if (usersTodoDelArr.length > 0) {
+        usersTodoDelArr.forEach(async (el) => {
+          const body = {
+            ...el,
+            task: el.task.map((task) =>
               task.name === state.editMode.value
                 ? {
                     ...task,
@@ -108,23 +144,6 @@ export const todoModule = {
                   }
                 : task,
             ),
-        };
-        newUsers.push(body);
-      });
-      if (usersTodoDelArr.length > 0) {
-        usersTodoDelArr.forEach(async (el) => {
-          const body = {
-            ...el,
-            task: el.task.map((task) =>
-                task.name === state.editMode.value
-                  ? {
-                      ...task,
-                      ...{
-                        name: values.todo,
-                      },
-                    }
-                  : task,
-              ),
           };
           await usersApi.editUser(el.id, body);
         });

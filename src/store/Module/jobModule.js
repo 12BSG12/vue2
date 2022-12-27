@@ -10,6 +10,10 @@ export const jobModule = {
       value: '',
     },
     updateUsers: [],
+    jobInfo: {
+      isError: false,
+      description: '',
+    },
   }),
   getters: {},
   mutations: {
@@ -35,6 +39,18 @@ export const jobModule = {
     updateUsers(state, users) {
       state.updateUsers = users;
     },
+    setJobInfo(state, { item, users }) {
+      const isError = users.some((user) => user.job === item.name);
+      state.jobInfo = {
+        isError,
+        description: isError
+          ? 'Данная должность кому-то принадлежит. Вы действительно хотите удалить её?'
+          : 'Удалить должность?',
+      };
+    },
+    setError(state, body){
+      state.jobInfo = body
+    }
   },
   actions: {
     setSearchQuery({ commit }, searchQuery) {
@@ -50,26 +66,32 @@ export const jobModule = {
       };
       commit('setJobs', [...state.jobs, await jobApi.createJob(body)]);
     },
-    async delJob({ commit }, { item, users }) {
-      await jobApi.delJob(item.id);
-      commit('delateJob', item.id);
-      const usersJobDelArr = users.filter((user) => {
-        if (user.job === item.name) {
-          return users;
-        }
+    async delJob({ state, commit }, { item, users }) {
+      commit('setError', {
+        isError: false,
+        description: '',
       });
-      usersJobDelArr.forEach(async (el) => {
-        const body = {
-          FIO: el.FIO,
-          job: '',
-          task: el.task,
-        };
-        await usersApi.editUser(el.id, body);
-      });
-      commit(
-        'updateUsers',
-        users.map((user) => (user.job === item.name ? { ...user, ...{ job: '' } } : user)),
-      );
+      if (!state.jobInfo.isError) {
+        await jobApi.delJob(item.id);
+        commit('delateJob', item.id);
+        const usersJobDelArr = users.filter((user) => {
+          if (user.job === item.name) {
+            return users;
+          }
+        });
+        usersJobDelArr.forEach(async (el) => {
+          const body = {
+            FIO: el.FIO,
+            job: '',
+            task: el.task,
+          };
+          await usersApi.editUser(el.id, body);
+        });
+        commit(
+          'updateUsers',
+          users.map((user) => (user.job === item.name ? { ...user, ...{ job: '' } } : user)),
+        );
+      } 
     },
     async updateJob({ state, commit }, { arg, users }) {
       const body = {
