@@ -2,11 +2,12 @@
   <a-list v-if="todos" item-layout="horizontal" :data-source="todos">
     <a-list-item slot="renderItem" slot-scope="todo">
       <a-card :title="todo.name" style="width: 500px">
-        <img class="alertImg" slot="extra" src="@/assets/success.png" />
-        <img class="alertImg" slot="extra" src="@/assets/Failed.png" />
+        <img v-if="todo.pending" class="alertImg" slot="extra" src="@/assets/time.png" />
+        <img v-if="todo.fulfilled" class="alertImg" slot="extra" src="@/assets/success.png" />
+        <img v-if="todo.rejected" class="alertImg" slot="extra" src="@/assets/Failed.png" />
         <a-popover slot="actions" title="Завершить задачу?" trigger="hover">
           <div class="alertDel" slot="content">
-            <a-button slot="content" size="small" @click="endTodo">Да</a-button>
+            <a-button slot="content" size="small" @click="updateUserTodoStatus(todo)" :disabled="todo.fulfilled">Да</a-button>
           </div>
           <a-button size="small"
             ><a-icon type="check-circle" theme="twoTone"
@@ -15,8 +16,8 @@
         <a-button
           slot="actions"
           size="small"
-          @click="() => showEditTodoForm(todo)"
-          :disabled="editModeTodo.isEdit"
+          @click="showEditTodoForm(todo)"
+          :disabled="editModeTodo.isEdit || todo.fulfilled"
           ><a-icon type="edit" theme="twoTone"
         /></a-button>
         <a-popover slot="actions" title="Удалить задачу?" trigger="hover">
@@ -61,6 +62,7 @@ export default Vue.extend({
     }),
     ...mapActions({
       delUserTodo: 'user/delUserTodo',
+      updateUserTodoStatus: 'user/updateUserTodoStatus',
     }),
     endTodo() {
     },

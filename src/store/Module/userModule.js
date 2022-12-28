@@ -23,6 +23,15 @@ export const userModule = {
     findUserTodo(state) {
       return state.users.find((user) => user.id === state.editMode.id)?.task;
     },
+    checkTime: () => (dateEnd) => {
+      const timeEnd = new Date(dateEnd).getTime();
+      const timeNow = new Date().getTime();
+      if (timeEnd >= timeNow) {
+        return { pending: false, fulfilled: false, rejected: true };
+      } else if (timeEnd < timeNow) {
+        return { pending: true, fulfilled: false, rejected: false };
+      }
+    },
   },
   mutations: {
     showEditForm(state, item) {
@@ -106,6 +115,9 @@ export const userModule = {
             name: arg.select,
             start: arg['range-picker'][0],
             end: arg['range-picker'][1],
+            pending: true,
+            fulfilled: false,
+            rejected: false,
           },
         ],
       };
@@ -118,20 +130,39 @@ export const userModule = {
     async updateUserTodoDate({ state, commit }, arg) {
       const body = {
         ...state.addTodoUserInfo,
-        task: state.users
-          .find((user) => user.id === state.addTodoUserInfo.id)
-          ?.task.map((task) =>
-            task.id === state.editModeTodo.id
-              ? {
-                  ...task,
-                  ...{
-                    name: state.editModeTodo.name,
-                    start: arg['range-picker'][0],
-                    end: arg['range-picker'][1],
-                  },
-                }
-              : task,
-          ),
+        task: state.addTodoUserInfo.task.map((task) =>
+          task.id === state.editModeTodo.id
+            ? {
+                ...task,
+                ...{
+                  start: arg['range-picker'][0],
+                  end: arg['range-picker'][1],
+                },
+              }
+            : task,
+        ),
+      };
+      await usersApi.editUser(state.addTodoUserInfo.id, body);
+      const users = state.users.map((user) =>
+        user.id === state.addTodoUserInfo.id ? { ...user, ...body } : user,
+      );
+      commit('setUsers', users);
+    },
+    async updateUserTodoStatus({ state, commit }, arg) {
+      const body = {
+        ...state.addTodoUserInfo,
+        task: state.addTodoUserInfo.task.map((task) =>
+          task.id === arg.id
+            ? {
+                ...task,
+                ...{
+                  pending: false,
+                  fulfilled: true,
+                  rejected: false,
+                },
+              }
+            : task,
+        ),
       };
       await usersApi.editUser(state.addTodoUserInfo.id, body);
       const users = state.users.map((user) =>

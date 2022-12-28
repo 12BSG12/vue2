@@ -81,9 +81,8 @@ export const jobModule = {
         });
         usersJobDelArr.forEach(async (el) => {
           const body = {
-            FIO: el.FIO,
+            ...el,
             job: '',
-            task: el.task,
           };
           await usersApi.editUser(el.id, body);
         });
@@ -110,9 +109,8 @@ export const jobModule = {
       });
       usersJobUpdateArr.forEach(async (el) => {
         const body = {
-          FIO: el.FIO,
+          ...el,
           job: arg.job,
-          task: el.task,
         };
         await usersApi.editUser(el.id, body);
       });
