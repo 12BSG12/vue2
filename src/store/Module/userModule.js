@@ -26,9 +26,9 @@ export const userModule = {
     checkTime: () => (dateEnd) => {
       const timeEnd = new Date(dateEnd).getTime();
       const timeNow = new Date().getTime();
-      if (timeEnd >= timeNow) {
+      if (timeEnd <= timeNow) {
         return { pending: false, fulfilled: false, rejected: true };
-      } else if (timeEnd < timeNow) {
+      } else if (timeEnd > timeNow) {
         return { pending: true, fulfilled: false, rejected: false };
       }
     },
@@ -105,7 +105,7 @@ export const userModule = {
       );
       commit('setUsers', users);
     },
-    async updateUserTodo({ state, commit }, arg) {
+    async updateUserTodo({ state, commit, getters }, arg) {
       const body = {
         ...state.addTodoUserInfo,
         task: [
@@ -115,9 +115,7 @@ export const userModule = {
             name: arg.select,
             start: arg['range-picker'][0],
             end: arg['range-picker'][1],
-            pending: true,
-            fulfilled: false,
-            rejected: false,
+            ...getters.checkTime(arg['range-picker'][1]),
           },
         ],
       };
@@ -127,16 +125,18 @@ export const userModule = {
       );
       commit('setUsers', users);
     },
-    async updateUserTodoDate({ state, commit }, arg) {
+    async updateUserTodoDate({ state, commit, getters }, arg) {
       const body = {
         ...state.addTodoUserInfo,
-        task: state.addTodoUserInfo.task.map((task) =>
+        task: state.users
+        .find((user) => user.id === state.addTodoUserInfo.id)?.task.map((task) =>
           task.id === state.editModeTodo.id
             ? {
                 ...task,
                 ...{
                   start: arg['range-picker'][0],
                   end: arg['range-picker'][1],
+                  ...getters.checkTime(arg['range-picker'][1]),
                 },
               }
             : task,
@@ -151,7 +151,8 @@ export const userModule = {
     async updateUserTodoStatus({ state, commit }, arg) {
       const body = {
         ...state.addTodoUserInfo,
-        task: state.addTodoUserInfo.task.map((task) =>
+        task: state.users
+        .find((user) => user.id === state.addTodoUserInfo.id)?.task.map((task) =>
           task.id === arg.id
             ? {
                 ...task,
@@ -170,12 +171,37 @@ export const userModule = {
       );
       commit('setUsers', users);
     },
-    async delUserTodo({ state, commit }, id) {
+    async checkRejectUserTodoStatus({ state, commit }) {
       const body = {
         ...state.addTodoUserInfo,
         task: state.users
           .find((user) => user.id === state.addTodoUserInfo.id)
-          ?.task.filter((task) => task.id !== id),
+          ?.task.map((task) =>
+            new Date(task.end).getTime() <= new Date().getTime() && !task.fulfilled
+              ? {
+                  ...task,
+                  ...{
+                    pending: false,
+                    fulfilled: false,
+                    rejected: true,
+                  },
+                }
+              : task,
+          ),
+      };
+      const isReject = body.task.some(item => item.rejected === true) 
+      if(isReject){
+        await usersApi.editUser(state.addTodoUserInfo.id, body);
+        const users = state.users.map((user) =>
+          user.id === state.addTodoUserInfo.id ? { ...user, ...body } : user,
+        );
+        commit('setUsers', users);
+      }
+    },
+    async delUserTodo({ state, commit }, id) {
+      const body = {
+        ...state.addTodoUserInfo,
+        task: state.addTodoUserInfo.task.filter((task) => task.id !== id),
       };
       await usersApi.editUser(state.addTodoUserInfo.id, body);
       const users = state.users.map((user) =>

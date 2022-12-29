@@ -48,11 +48,14 @@
       :dialog-style="{ top: '20px' }"
       v-model="showTodo"
       title="Информация о задачах"
-      @ok="showTodo = false"
+      :closable="false"
+      :maskClosable="false"
+      okText="Выход"
+      @ok="closeTodoModel"
     >
       <a-button v-if="!showAddTodoForm" @click="showAddTodoForm = true"> Добавить задачу </a-button>
       <UserAddTodoForm v-else :closeAddTodoForm="closeAddTodoForm" />
-      <UserTodoList :todos="todos" />
+      <UserTodoList v-if="showTodo" :todos="todos" ref="myChild" />
     </a-modal>
     <a-modal v-model="showAddForm" title="Добавить пользователя" @ok="showAddForm = false">
       <UserForm />
@@ -83,7 +86,7 @@ export default Vue.extend({
       showAddForm: false,
       showAddTodoForm: false,
       todos: [],
-      id: 0,
+      id: 0, 
     };
   },
   watch: {
@@ -132,6 +135,10 @@ export default Vue.extend({
     closeAddTodoForm(){
       this.showAddTodoForm = false;
     },
+    closeTodoModel(){
+      this.showTodo = false
+      this.$refs.myChild.clearSetInterval()
+    }
   },
   mounted(){
     this.getUsers()

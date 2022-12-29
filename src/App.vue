@@ -34,7 +34,7 @@ export default Vue.extend({
   computed:{
     ...mapState({
       todoError: state => state.todo.todoError,
-    })
+    }),
   },
   methods:{
     ...mapMutations({

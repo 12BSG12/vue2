@@ -7,11 +7,15 @@
         <img v-if="todo.rejected" class="alertImg" slot="extra" src="@/assets/Failed.png" />
         <a-popover slot="actions" title="Завершить задачу?" trigger="hover">
           <div class="alertDel" slot="content">
-            <a-button slot="content" size="small" @click="updateUserTodoStatus(todo)" :disabled="todo.fulfilled">Да</a-button>
+            <a-button
+              slot="content"
+              size="small"
+              @click="updateUserTodoStatus(todo)"
+              :disabled="todo.fulfilled || todo.rejected"
+              >Да</a-button
+            >
           </div>
-          <a-button size="small"
-            ><a-icon type="check-circle" theme="twoTone"
-          /></a-button>
+          <a-button size="small"><a-icon type="check-circle" theme="twoTone" /></a-button>
         </a-popover>
         <a-button
           slot="actions"
@@ -49,12 +53,19 @@ export default Vue.extend({
     UserEditTodoForm
   },
   props:{
-    todos: []
+    todos: [],
   },
   computed:{
     ...mapState({
       editModeTodo: state => state.user.editModeTodo,
     }),
+  },
+  mounted() {
+    this.intervalId = setInterval(() => {
+      if(!this.editModeTodo.isEdit){
+        this.checkRejectUserTodoStatus()
+      }
+    }, 20000);
   },
   methods:{
     ...mapMutations({
@@ -63,10 +74,14 @@ export default Vue.extend({
     ...mapActions({
       delUserTodo: 'user/delUserTodo',
       updateUserTodoStatus: 'user/updateUserTodoStatus',
+      checkRejectUserTodoStatus: 'user/checkRejectUserTodoStatus',
     }),
-    endTodo() {
-    },
-  }
+    clearSetInterval(){
+      if (this.intervalId) {
+        clearInterval(this.intervalId)
+      }
+    }
+  },
 });
 </script>
 
