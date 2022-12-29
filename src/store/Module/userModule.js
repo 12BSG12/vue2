@@ -104,8 +104,9 @@ export const userModule = {
         user.id === state.editMode.id ? { ...user, ...body } : user,
       );
       commit('setUsers', users);
+      commit('closeEditForm')
     },
-    async updateUserTodo({ state, commit, getters }, arg) {
+    async createUserTodo({ state, commit, getters }, arg) {
       const body = {
         ...state.addTodoUserInfo,
         task: [
@@ -147,6 +148,7 @@ export const userModule = {
         user.id === state.addTodoUserInfo.id ? { ...user, ...body } : user,
       );
       commit('setUsers', users);
+      commit('closeEditTodoForm')
     },
     async updateUserTodoStatus({ state, commit }, arg) {
       const body = {

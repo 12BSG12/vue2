@@ -120,6 +120,7 @@ export const jobModule = {
           user.job === state.editMode.value ? { ...user, ...{ job: arg.job } } : user,
         ),
       );
+      commit('closeEditForm')
     },
   },
   namespaced: true,

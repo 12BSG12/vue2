@@ -51,7 +51,7 @@ export default Vue.extend({
   },
   methods:{
     ...mapActions({
-      updateUserTodo: 'user/updateUserTodo'
+      createUserTodo: 'user/createUserTodo'
     }),
     handleSubmit(e) {
       e.preventDefault();
@@ -66,7 +66,8 @@ export default Vue.extend({
           'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')],
         };
         console.log('Received values of form: ', values);
-        this.updateUserTodo(values)
+        this.createUserTodo(values)
+        this.closeAddTodoForm()
       });
     },
   }

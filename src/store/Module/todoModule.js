@@ -149,6 +149,7 @@ export const todoModule = {
         });
       }
       commit('updateUsers', newUsers);
+      commit('closeEditForm')
     },
   },
   namespaced: true,
