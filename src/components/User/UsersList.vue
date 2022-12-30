@@ -1,14 +1,7 @@
 <template>
   <div>
     <a-card title="Пользователи">
-      <a-input-search
-        slot="extra"
-        placeholder="Поиск"
-        :loading="false"
-        enter-button
-        v-model="query"
-        @input="debouncedSearch"
-      />
+      <CustomSearchInput v-model="query" :debounceFunc='getUsers'/>
       <a-list item-layout="horizontal" :data-source="users">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-button slot="actions" size="small" @click="showModal(item)"> Задачи </a-button>
@@ -73,8 +66,8 @@ import UserTodoList from "./UserTodoList.vue";
 import UserEditForm from "./UserEditForm.vue";
 import UserAddTodoForm from "./UserAddTodoForm.vue";
 import JobForm from "../Job/JobAddForm.vue";
+import CustomSearchInput from "@/components/CustomSearchInput.vue";
 import {mapState, mapMutations, mapActions} from 'vuex'
-import debounce from 'lodash/debounce';
 
 export default Vue.extend({
   name: 'UsersList',
@@ -83,7 +76,8 @@ export default Vue.extend({
     UserTodoList,
     UserEditForm,
     UserAddTodoForm,
-    JobForm
+    JobForm,
+    CustomSearchInput
   },
   data() {
     return {
@@ -135,9 +129,6 @@ export default Vue.extend({
       this.showTodo = true;
       this.setTodoUserInfo(item)
     },
-    debouncedSearch: debounce(function() {
-      this.getUsers();
-    }, 250),
     closeAddTodoForm(){
       this.showAddTodoForm = false;
     },

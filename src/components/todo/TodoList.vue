@@ -1,14 +1,7 @@
 <template>
   <div>
     <a-card title="Задачи">
-      <a-input-search
-        slot="extra"
-        placeholder="Поиск"
-        :loading="false"
-        enter-button
-        v-model="query"
-        @input="debouncedSearch"
-      />
+      <CustomSearchInput v-model="query" :debounceFunc='getTodos'/>
       <a-list item-layout="horizontal" :data-source="todos">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-button
@@ -50,15 +43,16 @@
 <script lang="js">
 import Vue from 'vue';
 import {mapState, mapActions, mapMutations} from 'vuex'
-import debounce from 'lodash/debounce';
 import TodoEditForm from './TodoEditForm.vue'
 import TodoForm from './TodoAddForm.vue'
+import CustomSearchInput from '@/components/CustomSearchInput.vue'
 
 export default Vue.extend({
   name: 'TodoList',
   components:{
     TodoEditForm,
-    TodoForm
+    TodoForm,
+    CustomSearchInput
   },
   data() {
     return {
@@ -100,10 +94,7 @@ export default Vue.extend({
     }),
     showModal() {
       this.showTodo = true;
-    },
-    debouncedSearch: debounce(function() {
-      this.getTodos();
-    }, 250),
+    }
   },
   mounted(){
     this.getTodos()

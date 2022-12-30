@@ -1,14 +1,7 @@
 <template>
   <div>
     <a-card title="Должности">
-      <a-input-search
-        slot="extra"
-        placeholder="Поиск"
-        :loading="false"
-        enter-button
-        v-model="query"
-        @input="debouncedSearch"
-      />
+      <CustomSearchInput v-model="query" :debounceFunc='getJobs'/>
       <a-list item-layout="horizontal" :data-source="jobs">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-button
@@ -52,15 +45,16 @@
 <script lang="js">
 import Vue from 'vue';
 import {mapState, mapActions, mapMutations} from 'vuex'
-import debounce from 'lodash/debounce';
 import jobEditForm from './JobEditForm.vue'
 import JobForm from './JobAddForm.vue'
+import CustomSearchInput from '@/components/CustomSearchInput.vue'
 
 export default Vue.extend({
   name: 'JobList',
   components:{
     jobEditForm,
-    JobForm
+    JobForm,
+    CustomSearchInput
   },
   data() {
     return {
@@ -104,10 +98,7 @@ export default Vue.extend({
     }),
     showModal() {
       this.showTodo = true;
-    },
-    debouncedSearch: debounce(function() {
-      this.getJobs();
-    }, 250),
+    }
   },
   mounted(){
     this.getJobs()
