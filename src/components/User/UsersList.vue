@@ -30,7 +30,7 @@
           </a-popover>
           <a-list-item-meta>
             <div slot="title">
-              <UserEditForm v-if="item.id === editMode.id && editMode.isEdit" />
+              <UserEditForm v-if="item.id === editMode.id && editMode.isEdit" :showJobForm="showJobForm"/>
               <div v-else class="userInfo">
                 <span>{{ item.FIO }}</span>
                 <span>{{ item.job }}</span>
@@ -60,6 +60,9 @@
     <a-modal v-model="showAddForm" title="Добавить пользователя" @ok="showAddForm = false">
       <UserForm />
     </a-modal>
+    <a-modal v-model="showAddJobForm" title="Добавить должность" @ok="showAddJobForm = false">
+      <JobForm />
+    </a-modal>
   </div>
 </template>
 
@@ -69,6 +72,7 @@ import UserForm from "./UserAddForm.vue";
 import UserTodoList from "./UserTodoList.vue";
 import UserEditForm from "./UserEditForm.vue";
 import UserAddTodoForm from "./UserAddTodoForm.vue";
+import JobForm from "../Job/JobAddForm.vue";
 import {mapState, mapMutations, mapActions} from 'vuex'
 import debounce from 'lodash/debounce';
 
@@ -78,13 +82,15 @@ export default Vue.extend({
     UserForm,
     UserTodoList,
     UserEditForm,
-    UserAddTodoForm
+    UserAddTodoForm,
+    JobForm
   },
   data() {
     return {
       showTodo: false,
       showAddForm: false,
       showAddTodoForm: false,
+      showAddJobForm: false,
       todos: [],
       id: 0, 
     };
@@ -134,6 +140,9 @@ export default Vue.extend({
     }, 250),
     closeAddTodoForm(){
       this.showAddTodoForm = false;
+    },
+    showJobForm(){
+      this.showAddJobForm = true;
     },
     closeTodoModel(){
       this.showTodo = false

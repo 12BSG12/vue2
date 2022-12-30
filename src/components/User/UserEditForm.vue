@@ -11,19 +11,27 @@
         ]"
       />
     </a-form-item>
-    <a-form-item label="Должность" has-feedback>
-      <a-select
-        v-decorator="[
-          'select',
-          {
-            initialValue: this.editMode.selectValue,
-            rules: [{ required: true, message: 'Please select your todo!' }],
-          },
-        ]"
-      >
-        <a-select-option v-for="job in jobs" :value="job.name" :key="job.id">{{job.name}}</a-select-option>
-      </a-select>
-    </a-form-item>
+    <div class="formEdit">
+      <a-form-item label="Должность" has-feedback>
+        <a-select
+          style=""
+          v-decorator="[
+            'select',
+            {
+              initialValue: this.editMode.selectValue,
+              rules: [{ required: true, message: 'Please select your todo!' }],
+            },
+          ]"
+        >
+          <a-select-option v-for="job in jobs" :value="job.name" :key="job.id">{{
+            job.name
+          }}</a-select-option>
+        </a-select>
+      </a-form-item>
+      <div class="addNewJob">
+        <a-button type="primary" size="small" @click="showJobForm"> + </a-button>
+      </div>
+    </div>
     <div class="formBtn">
       <a-button type="primary" html-type="submit">Сохранить</a-button>
       <a-button style="margin-left: 20px" type="primary" @click="closeEditForm">Отмена</a-button>
@@ -37,6 +45,12 @@ import {mapState, mapMutations, mapActions} from 'vuex'
 
 export default Vue.extend({
   name: 'UserEditForm',
+  props: {
+    showJobForm: {
+      type: Function,
+      require: true
+    }
+  },
   data() {
     return {
       form: this.$form.createForm(this, { name: 'validate_other' }),
@@ -75,5 +89,14 @@ export default Vue.extend({
 }
 .formBtn {
   margin-top: 10px;
+}
+.formEdit {
+  display: flex;
+  align-items: center;
+}
+.addNewJob{
+  position: relative;
+  left: 10px;
+  top: 20px;
 }
 </style>
